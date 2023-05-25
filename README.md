@@ -1,9 +1,39 @@
 # Case Converter
 
-Pass a text file and convert case line by line
+Simple CLI tool for text conversion to various multiple-word identifier formats (cases).
+
+## Usage
 
 ```sh
-while read -r line; do case-converter --case snake $line; done < input.txt
+# Convert "Random word" to snake case
+./case-converter -c snake Random word
+
+# Prints
+random_word
+
+```
+
+### Supported formats
+
+Pass `-c`, `--case` argument to convert to one of the supported formats
+
+| Format        | Value           |
+| --------------|-----------------|
+| camelCase     | camel (default) |
+| lowercase     | lower           |
+| UPPERCASE     | upper           |
+| PascalCase    | pascal          |
+| snake_case    | snake	          |
+| kebab-case    | kebab	          |
+| CONSTANT_CASE | const	          |
+| Train-Case    | train	          |
+
+**Note**: `camel` is the default case if one is not provided
+
+### Pass a text file and convert case line by line
+
+```sh
+while read -r line; do ./case-converter --case snake $line; done < input.txt
 ```
 
 Prints:
