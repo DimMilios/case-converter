@@ -7,15 +7,14 @@ import (
 	"strings"
 )
 
-
 func main() {
 	flag.Parse()
 
-    if help {
-        fmt.Println("Case Converter")
-	    flag.PrintDefaults()
+	if help {
+		fmt.Println("Case Converter")
+		flag.PrintDefaults()
 		os.Exit(0)
-    }
+	}
 
 	args := flag.Args()
 
@@ -32,7 +31,7 @@ func main() {
 		os.Exit(0)
 	}
 
-    // Handle input string contained in quotation marks ("")
+	// Handle input string contained in quotation marks ("")
 	var argFields [][]string
 	for _, s := range args {
 		fields := strings.Fields(s)
@@ -52,6 +51,6 @@ var help bool
 func init() {
 	flag.StringVar(&caseType, "case", CamelCase, "case to convert to")
 	flag.StringVar(&caseType, "c", CamelCase, "case to convert to")
-    flag.BoolVar(&help, "help", false, "print help")
-    flag.BoolVar(&help, "h", false, "print help")
+	flag.BoolVar(&help, "help", false, "print help")
+	flag.BoolVar(&help, "h", false, "print help")
 }
