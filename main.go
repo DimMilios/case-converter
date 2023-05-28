@@ -11,46 +11,86 @@ func main() {
 	flag.Parse()
 
 	if help {
-		fmt.Println("Case Converter")
-		flag.PrintDefaults()
+		printHelp()
 		os.Exit(0)
 	}
 
 	args := flag.Args()
+	converter, err := NewConverter(caseType)
+    if err != nil {
+        fmt.Println(err)
+		os.Exit(1)
+    }
 
-	if len(args) == 0 {
-		fmt.Println("no text to convert provided")
+	if err := runCmd(converter, args); err != nil {
+		fmt.Println(err)
+
+		if err.Error() == ErrNoText {
+			printHelp()
+		}
 		os.Exit(1)
 	}
 
-	converter := NewConverter(caseType)
-
-	if len(args) > 1 {
-		conv := converter.convert(&args)
-		fmt.Println(conv)
-		os.Exit(0)
-	}
-
-	// Handle input string contained in quotation marks ("")
-	var argFields [][]string
-	for _, s := range args {
-		fields := strings.Fields(s)
-		argFields = append(argFields, fields)
-	}
-
-	for _, f := range argFields {
-		conv := converter.convert(&f)
-		fmt.Println(conv)
-	}
 	os.Exit(0)
 }
 
-var caseType string
-var help bool
+func runCmd(c *Converter, args []string) error {
+	var err error
+	if len(args) == 0 && !isFlagPassed("f", "file") {
+		return fmt.Errorf("%v", ErrNoText)
+	}
+
+	if len(fileInput) > 0 {
+		if err = c.convertFileLines(fileInput); err != nil {
+			return err
+		}
+	}
+
+	if len(args) > 1 {
+		conv := c.convert(args)
+		fmt.Println(conv)
+	} else {
+		// Handle input string contained in quotation marks ("")
+		for _, s := range args {
+			fields := strings.Fields(s)
+			conv := c.convert(fields)
+			fmt.Println(conv)
+		}
+	}
+
+	return nil
+}
+
+var (
+	caseType  string
+	help      bool
+	fileInput string
+)
+
+const ErrNoText = "no text to convert provided"
 
 func init() {
 	flag.StringVar(&caseType, "case", CamelCase, "case to convert to")
 	flag.StringVar(&caseType, "c", CamelCase, "case to convert to")
 	flag.BoolVar(&help, "help", false, "print help")
 	flag.BoolVar(&help, "h", false, "print help")
+	flag.StringVar(&fileInput, "file", "", "input file to convert")
+	flag.StringVar(&fileInput, "f", "", "input file to convert")
+}
+
+func isFlagPassed(names ...string) bool {
+	found := false
+	flag.Visit(func(f *flag.Flag) {
+		for _, name := range names {
+			if f.Name == name {
+				found = true
+			}
+		}
+	})
+	return found
+}
+
+func printHelp() {
+	fmt.Println("Case Converter")
+	flag.PrintDefaults()
 }

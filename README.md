@@ -33,7 +33,7 @@ Pass `-c`, `--case` argument to convert to one of the supported formats
 ### Pass a text file and convert case line by line
 
 ```sh
-while read -r line; do ./case-converter --case snake $line; done < input.txt
+./case-converter --case snake --file input.txt
 ```
 
 Prints:
