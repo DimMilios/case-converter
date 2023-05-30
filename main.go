@@ -17,10 +17,10 @@ func main() {
 
 	args := flag.Args()
 	converter, err := NewConverter(caseType)
-    if err != nil {
-        fmt.Println(err)
+	if err != nil {
+		fmt.Println(err)
 		os.Exit(1)
-    }
+	}
 
 	if err := runCmd(converter, args); err != nil {
 		fmt.Println(err)
@@ -91,6 +91,11 @@ func isFlagPassed(names ...string) bool {
 }
 
 func printHelp() {
-	fmt.Println("Case Converter")
-	flag.PrintDefaults()
+	os.Stderr.WriteString(`Usage: case-converter [options...] <text>
+-c, case string
+    case to convert to (default "camel")
+-f, file string
+    input file to convert
+-h, help
+print help`)
 }
