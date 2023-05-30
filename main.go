@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -35,15 +36,24 @@ func main() {
 }
 
 func runCmd(c *Converter, args []string) error {
-	var err error
 	if len(args) == 0 && !isFlagPassed("f", "file") {
 		return fmt.Errorf("%v", ErrNoText)
 	}
 
+    var errs []error
 	if len(fileInput) > 0 {
-		if err = c.convertFileLines(fileInput); err != nil {
-			return err
+		go c.convertFileLines(fileInput)
+		for result := range c.outch {
+            if result.error != nil {
+                errs = append(errs, result.error)
+                continue
+            }
+            fmt.Println(result.text)
 		}
+
+        if len(errs) > 1 {
+            return errors.Join(errs...)
+        }
 	}
 
 	if len(args) > 1 {

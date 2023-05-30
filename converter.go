@@ -23,6 +23,12 @@ var cases = [8]string{LowerCase, UpperCase, CamelCase, PascalCase, SnakeCase, Ke
 
 type Converter struct {
 	caseType string
+	outch    chan Result
+}
+
+type Result struct {
+	text  string
+	error error
 }
 
 func NewConverter(caseType string) (*Converter, error) {
@@ -32,6 +38,7 @@ func NewConverter(caseType string) (*Converter, error) {
 
 	return &Converter{
 		caseType: caseType,
+		outch:    make(chan Result),
 	}, nil
 }
 
@@ -71,24 +78,24 @@ func (c *Converter) convertLine(line string) string {
 	return c.convert(words)
 }
 
-func (c *Converter) convertFileLines(filePath string) error {
+func (c *Converter) convertFileLines(filePath string) {
 	f, err := os.Open(filePath)
 	if err != nil {
 		fmt.Printf("unable to read file: %v", err)
-		return err
+		c.outch <- Result{error: err}
 	}
 	defer f.Close()
 	scanner := bufio.NewScanner(f)
 	for scanner.Scan() {
 		s := scanner.Text()
 		conv := c.convertLine(s)
-		fmt.Println(conv)
+		c.outch <- Result{text: conv, error: nil}
 	}
 
 	if err := scanner.Err(); err != nil {
-		return err
+		c.outch <- Result{error: err}
 	}
-	return nil
+	close(c.outch)
 }
 
 func isCaseSupported(caseType string) bool {
