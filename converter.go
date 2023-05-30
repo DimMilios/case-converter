@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"unicode"
@@ -78,14 +79,18 @@ func (c *Converter) convertLine(line string) string {
 	return c.convert(words)
 }
 
+
 func (c *Converter) convertFileLines(filePath string) {
 	f, err := os.Open(filePath)
 	if err != nil {
-		fmt.Printf("unable to read file: %v", err)
 		c.outch <- Result{error: err}
 	}
-	defer f.Close()
-	scanner := bufio.NewScanner(f)
+    defer f.Close()
+    c.writeLines(f)
+}
+
+func (c *Converter) writeLines(handle io.Reader) {
+	scanner := bufio.NewScanner(handle)
 	for scanner.Scan() {
 		s := scanner.Text()
 		conv := c.convertLine(s)

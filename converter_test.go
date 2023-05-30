@@ -143,3 +143,33 @@ func TestConvertTrain(t *testing.T) {
 		}
 	}
 }
+
+func TestConvertFile(t *testing.T) {
+	c, _ := NewConverter(SnakeCase)
+
+	r := `Random words
+Υποστηρίζει ελληνικά;
+MANY WORDS TEST WEATHER KEYBOARD MOUSEPAD CUP
+Words containing numerics123
+Numerics 123
+lower case words` // 6 lines
+
+	go c.writeLines(strings.NewReader(r))
+
+	// Store everything we get from the channel
+	var channelOut []string
+	for res := range c.outch {
+		if res.error != nil {
+			t.Error(res.error)
+		}
+		channelOut = append(channelOut, res.text)
+	}
+
+	var want = []string{"random_words", "υποστηρίζει_ελληνικά;", "many_words_test_weather_keyboard_mousepad_cup", "words_containing_numerics123", "numerics_123", "lower_case_words"}
+	for i, v := range want {
+		if v != channelOut[i] {
+			t.Errorf("got \"%s\", want \"%s\"", channelOut[i], v)
+		}
+	}
+
+}
