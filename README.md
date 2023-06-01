@@ -6,12 +6,22 @@ Simple CLI tool for text conversion to various multiple-word identifier formats 
 
 ```sh
 # Convert "Random word" to snake case
-./case-converter -c snake Random word
+case-converter -c snake Three random word
 
 # Prints
-random_word
+three_random_words
 
 ```
+
+### Available commands
+
+
+| Command    | Description     |
+| -----------|-----------------|
+| -c, --case | Convert to one of the supported cases (more below) |
+| -l, --list | List all available supported cases |
+| -f, --file | Provide `file` as input. `file` is read and executed line by line |
+| -h, --help | Print help message |
 
 ### Supported formats
 
@@ -33,7 +43,7 @@ Pass `-c`, `--case` argument to convert to one of the supported formats
 ### Pass a text file and convert case line by line
 
 ```sh
-./case-converter --case snake --file input.txt
+case-converter --case snake --file input.txt
 ```
 
 Prints:
