@@ -38,7 +38,7 @@ func NewConverter(caseType string) (*Converter, error) {
 	}
 
 	return &Converter{
-		caseType: caseType,
+		caseType: strings.ToLower(caseType),
 		outch:    make(chan Result),
 	}, nil
 }
@@ -79,14 +79,13 @@ func (c *Converter) convertLine(line string) string {
 	return c.convert(words)
 }
 
-
 func (c *Converter) convertFileLines(filePath string) {
 	f, err := os.Open(filePath)
 	if err != nil {
 		c.outch <- Result{error: err}
 	}
-    defer f.Close()
-    c.writeLines(f)
+	defer f.Close()
+	c.writeLines(f)
 }
 
 func (c *Converter) writeLines(handle io.Reader) {
@@ -104,8 +103,9 @@ func (c *Converter) writeLines(handle io.Reader) {
 }
 
 func isCaseSupported(caseType string) bool {
+	l := strings.ToLower(caseType)
 	for _, c := range cases {
-		if c == caseType {
+		if c == l {
 			return true
 		}
 	}
