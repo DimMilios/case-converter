@@ -16,10 +16,16 @@ func main() {
 		os.Exit(0)
 	}
 
+	if listAll {
+		printList()
+		os.Exit(0)
+	}
+
 	args := flag.Args()
 	converter, err := NewConverter(caseType)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, err.Error())
+		fmt.Fprintln(os.Stderr, err.Error() + "\n")
+        printList()
 		os.Exit(1)
 	}
 
@@ -74,6 +80,7 @@ func runCmd(c *Converter, args []string) error {
 var (
 	caseType  string
 	help      bool
+	listAll   bool
 	fileInput string
 )
 
@@ -84,6 +91,8 @@ func init() {
 	flag.StringVar(&caseType, "c", CamelCase, "case to convert to")
 	flag.BoolVar(&help, "help", false, "print help")
 	flag.BoolVar(&help, "h", false, "print help")
+	flag.BoolVar(&listAll, "list", false, "print all supported cases")
+	flag.BoolVar(&listAll, "l", false, "print all supported cases")
 	flag.StringVar(&fileInput, "file", "", "input file to convert")
 	flag.StringVar(&fileInput, "f", "", "input file to convert")
 }
@@ -104,10 +113,16 @@ func printHelp() {
 	usage := `Usage: case-converter [options...] <text>
 -c, case string
     case to convert to
+-l, list
+    print all supported cases
 -f, file string
-    file to convert
+    file to convert line by line
 -h, help
     print help`
 
 	fmt.Fprintln(os.Stderr, usage)
+}
+
+func printList() {
+	fmt.Fprintf(os.Stderr, "supported cases:\n%s\n", strings.Join(cases[:], "\n"))
 }
