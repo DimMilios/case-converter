@@ -19,14 +19,14 @@ func main() {
 	args := flag.Args()
 	converter, err := NewConverter(caseType)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
 
 	if err := runCmd(converter, args); err != nil {
-		fmt.Println(err)
+		fmt.Fprintln(os.Stderr, err.Error())
 
-		if err.Error() == ErrNoText {
+		if strings.Contains(err.Error(), ErrNoText) {
 			printHelp()
 		}
 		os.Exit(1)
@@ -37,23 +37,23 @@ func main() {
 
 func runCmd(c *Converter, args []string) error {
 	if len(args) == 0 && !isFlagPassed("f", "file") {
-		return fmt.Errorf("%v", ErrNoText)
+		return fmt.Errorf("%v\n", ErrNoText)
 	}
 
-    var errs []error
+	var errs []error
 	if len(fileInput) > 0 {
 		go c.convertFileLines(fileInput)
 		for result := range c.outch {
-            if result.error != nil {
-                errs = append(errs, result.error)
-                continue
-            }
-            fmt.Println(result.text)
+			if result.error != nil {
+				errs = append(errs, result.error)
+				continue
+			}
+			fmt.Println(result.text)
 		}
 
-        if len(errs) > 1 {
-            return errors.Join(errs...)
-        }
+		if len(errs) > 1 {
+			return errors.Join(errs...)
+		}
 	}
 
 	if len(args) > 1 {
@@ -101,11 +101,13 @@ func isFlagPassed(names ...string) bool {
 }
 
 func printHelp() {
-	os.Stderr.WriteString(`Usage: case-converter [options...] <text>
+	usage := `Usage: case-converter [options...] <text>
 -c, case string
-    case to convert to (default "camel")
+    case to convert to
 -f, file string
-    input file to convert
+    file to convert
 -h, help
-print help`)
+    print help`
+
+	fmt.Fprintln(os.Stderr, usage)
 }
