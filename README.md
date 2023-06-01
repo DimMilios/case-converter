@@ -20,7 +20,7 @@ three_random_words
 | -----------|-----------------|
 | -c, --case | Convert to one of the supported cases (more below) |
 | -l, --list | List all available supported cases |
-| -f, --file | Provide `file` as input. `file` is read and executed line by line |
+| -f, --file | Provide `file` as input. `file` is read and converted line by line |
 | -h, --help | Print help message |
 
 ### Supported formats
